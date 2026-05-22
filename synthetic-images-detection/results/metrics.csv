@@ -3,20 +3,20 @@ clip,intra (same source & cat),0.8382394197404976
 clip,inter biggan-vs-sdv15 (same cat),0.8638294637905725
 clip,inter real-vs-fake (same cat),0.8808097653793133
 clip,inter real-cat A vs real-cat B,1.032256963023839
-clip,silhouette 3-class (real/GAN/diff),-0.008544579148292542
-clip,silhouette real vs fake,0.010157452896237373
-clip,silhouette GAN vs diff (fakes only),0.03807464987039566
-fft,intra (same source & cat),57.640582740379855
-fft,inter biggan-vs-sdv15 (same cat),78.80739617631824
-fft,inter real-vs-fake (same cat),67.86591572616827
-fft,inter real-cat A vs real-cat B,61.233597951303295
-fft,silhouette 3-class (real/GAN/diff),0.0343727245926857
-fft,silhouette real vs fake,0.06212833523750305
-fft,silhouette GAN vs diff (fakes only),0.25300630927085876
+clip,silhouette 3-class (real/GAN/diff),-0.0085445791482925
+clip,silhouette real vs fake,0.0101574528962373
+clip,silhouette GAN vs diff (fakes only),0.0380746498703956
 srm,intra (same source & cat),3.357334800467583
 srm,inter biggan-vs-sdv15 (same cat),2.860441317895244
-srm,inter real-vs-fake (same cat),3.9515886279468093
-srm,inter real-cat A vs real-cat B,5.1004377364385585
+srm,inter real-vs-fake (same cat),3.951588627946809
+srm,inter real-cat A vs real-cat B,5.100437736438559
 srm,silhouette 3-class (real/GAN/diff),-0.316891610622406
-srm,silhouette real vs fake,-0.05839057266712189
-srm,silhouette GAN vs diff (fakes only),0.16550852358341217
+srm,silhouette real vs fake,-0.0583905726671218
+srm,silhouette GAN vs diff (fakes only),0.1655085235834121
+fft,intra (same source & cat),42.260669003988404
+fft,inter biggan-vs-sdv15 (same cat),57.15125854782214
+fft,inter real-vs-fake (same cat),53.11461888116615
+fft,inter real-cat A vs real-cat B,47.71785189647224
+fft,silhouette 3-class (real/GAN/diff),0.031067561358213425
+fft,silhouette real vs fake,0.09553593397140503
+fft,silhouette GAN vs diff (fakes only),0.20300893485546112

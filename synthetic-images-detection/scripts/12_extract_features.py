@@ -3,15 +3,20 @@
 For each image (real / BigGAN / SDv1.5, across 5 super-cats):
 
 - CLIP ViT-B/32 image embeddings (semantic baseline, 512-d)
-- FFT log-magnitude upper-left 64x64 quadrant flattened (4096-d)
+- FFT log-magnitude: fftshift-centered spectrum, upper-left 64x64 corner
+  (captures mid-to-high frequencies where GAN/diffusion artifacts live, 4096-d)
 - SRM high-pass residuals -> PCA to 256-d (artifact / noise space)
 
 All features and labels are saved to cache/features.npz so the
 analysis step is cheap to re-run.
+
+Pass --only-fft to recompute only the FFT features and patch the existing
+features.npz in-place (CLIP and SRM are preserved as-is).
 """
 
 from __future__ import annotations
 
+import argparse
 import sys
 import time
 from pathlib import Path
@@ -105,7 +110,12 @@ def extract_clip(images: np.ndarray) -> np.ndarray:
 
 
 def extract_fft(images: np.ndarray) -> np.ndarray:
-    """Per-image: grayscale -> 2D FFT -> log mag -> upper-left FFT_QUAD x FFT_QUAD -> flatten."""
+    """Per-image: grayscale -> 2D FFT -> fftshift -> log mag -> upper-left 64x64 -> flatten.
+
+    fftshift recentres the DC component to (H/2, W/2), so the upper-left 64x64
+    corner of the shifted spectrum corresponds to the mid-to-high frequency
+    region — where GAN checkerboard and diffusion pipeline artefacts manifest.
+    """
     print(f"[fft] computing on {len(images)} images ...", flush=True)
     t0 = time.time()
     # luminance-Y as a single float32 array (N, H, W)
@@ -121,7 +131,7 @@ def extract_fft(images: np.ndarray) -> np.ndarray:
     chunk = 256
     for start in range(0, n, chunk):
         stop = min(start + chunk, n)
-        f = np.fft.fft2(gray[start:stop])
+        f = np.fft.fftshift(np.fft.fft2(gray[start:stop]))
         mag = np.log1p(np.abs(f))
         out[start:stop] = mag[:, :FFT_QUAD, :FFT_QUAD].reshape(stop - start, -1)
     print(
@@ -171,7 +181,48 @@ def extract_srm(images: np.ndarray, pca_dim: int = SRM_PCA_DIM) -> tuple[np.ndar
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--only-fft",
+        action="store_true",
+        help="Recompute only FFT features and patch the existing features.npz in-place.",
+    )
+    args = parser.parse_args()
+
     out_path = CACHE_DIR / "features.npz"
+
+    if args.only_fft:
+        if not out_path.is_file():
+            print(f"[error] {out_path} not found. Run without --only-fft first.")
+            return
+        print("[only-fft] loading existing features.npz ...", flush=True)
+        existing = np.load(out_path, allow_pickle=True)
+
+        print("[only-fft] loading manifests ...", flush=True)
+        df = load_manifests()
+
+        print(f"[only-fft] loading {len(df)} images into memory ...", flush=True)
+        t0 = time.time()
+        images = load_images(df)
+        print(f"  done in {time.time() - t0:.1f}s", flush=True)
+
+        print("[only-fft] recomputing FFT features ...", flush=True)
+        fft_feats = extract_fft(images)
+
+        np.savez_compressed(
+            out_path,
+            clip=existing["clip"],
+            fft=fft_feats,
+            srm=existing["srm"],
+            srm_norms=existing["srm_norms"],
+            source=existing["source"],
+            super_cat=existing["super_cat"],
+            class_idx=existing["class_idx"],
+            local_path=existing["local_path"],
+        )
+        print(f"[only-fft] patched {out_path}", flush=True)
+        return
+
     if out_path.is_file():
         print(f"[skip] {out_path} already exists; delete to regenerate.")
         return

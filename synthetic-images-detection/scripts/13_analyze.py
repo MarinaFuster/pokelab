@@ -16,6 +16,7 @@ The five measurements per feature space, matching the execution plan:
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -191,6 +192,7 @@ def compute_metrics(feat: np.ndarray, sources: np.ndarray, cats: np.ndarray) -> 
         sil_gan_vs_diff = float("nan")
 
     return {
+        # comment: cat in general should refer to 'super-category'
         "intra (same source & cat)": intra,
         "inter biggan-vs-sdv15 (same cat)": bg_sd,
         "inter real-vs-fake (same cat)": real_fake,
@@ -202,6 +204,14 @@ def compute_metrics(feat: np.ndarray, sources: np.ndarray, cats: np.ndarray) -> 
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--only-fft",
+        action="store_true",
+        help="Recompute only FFT UMAP/metrics and patch metrics.csv in-place.",
+    )
+    args = parser.parse_args()
+
     print("[load] features.npz", flush=True)
     data = load_features()
     sources = data["source"]
@@ -212,11 +222,12 @@ def main() -> None:
         pd.crosstab(pd.Series(sources, name="source"), pd.Series(cats, name="super_cat")).to_string()
     )
 
-    spaces = [
+    all_spaces = [
         ("clip", "cosine", "Baseline 1 — Semantic (CLIP ViT-B/32)"),
-        ("fft", "euclidean", "Experiment 2a — FFT log-magnitude (upper-left 64x64)"),
+        ("fft", "euclidean", "Experiment 2a — FFT log-magnitude (fftshift, upper-left 64x64, mid-to-high freq)"),
         ("srm", "euclidean", "Experiment 2b — SRM high-pass residual (PCA-256)"),
     ]
+    spaces = [s for s in all_spaces if s[0] == "fft"] if args.only_fft else all_spaces
 
     metric_rows = []
     for key, umap_metric, title in spaces:
@@ -233,13 +244,20 @@ def main() -> None:
         for k, v in m.items():
             print(f"    {k:42s} = {v: .6f}")
 
-    df = pd.DataFrame(metric_rows)
     out_csv = RESULTS_DIR / "metrics.csv"
+    if args.only_fft and out_csv.is_file():
+        existing_df = pd.read_csv(out_csv)
+        existing_df = existing_df[existing_df["feature_space"] != "fft"]
+        df = pd.concat([existing_df, pd.DataFrame(metric_rows)], ignore_index=True)
+    else:
+        df = pd.DataFrame(metric_rows)
+
     df.to_csv(out_csv, index=False)
     print(f"\n[done] wrote {out_csv}")
 
+    present = [k for k, _, _ in all_spaces if k in df["feature_space"].values]
     pivot = df.pivot(index="measurement", columns="feature_space", values="value")
-    pivot = pivot[["clip", "fft", "srm"]]
+    pivot = pivot[[c for c in ["clip", "fft", "srm"] if c in pivot.columns]]
     print("\n=== summary table ===")
     print(pivot.to_string(float_format=lambda x: f"{x: .4f}"))
     pivot.to_csv(RESULTS_DIR / "metrics_pivot.csv")
