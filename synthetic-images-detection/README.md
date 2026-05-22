@@ -1,6 +1,4 @@
-# 📋 Research Writeup
-
-## ❓ Question
+# ❓ Question
 Do generation methods share a common artifact signature that is consistently separable from the artifact space of real camera pipelines? Is synthetic image content sufficiently homogeneous across generation methods to be treated as a single detectable class?
 
 ## 💭 Thought Process

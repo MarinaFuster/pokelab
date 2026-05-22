@@ -1,18 +1,18 @@
 ---
 name: execution-plan-generator
-description: Read a writeup.md and produce a detailed execution_plan.md for an ML experiment. Trigger when user asks to create an execution plan, generate a plan from a writeup, or prepare an experiment for agent execution. Always use this skill when a writeup.md or experiment description needs to be turned into a concrete, executable plan.
+description: Read a README.md and produce a detailed execution_plan.md for an ML experiment. Trigger when user asks to create an execution plan, generate a plan from a README, or prepare an experiment for agent execution. Always use this skill when a README.md or experiment description needs to be turned into a concrete, executable plan.
 ---
 
 # Execution Plan Generator
 
-Read `<folder>/writeup.md` and produce `<folder>/execution_plan.md` that an agent can execute without ambiguity.
+Read `<folder>/README.md` and produce `<folder>/execution_plan.md` that an agent can execute without ambiguity.
 
 ## Parameters
-- **folder** (required): path containing `writeup.md`. Ask if not provided.
+- **folder** (required): path containing `README.md`. Ask if not provided.
 
 ## Behavior
 
-1. Read `<folder>/writeup.md` thoroughly
+1. Read `<folder>/README.md` thoroughly
 2. Focus on the "Experiment Idea" section — that is what the agent will implement
 3. Check system constraints before planning:
    - Run `nvidia-smi` (GPU availability/VRAM) and `df -h` (disk space) and `nproc` / `free -h` (CPU/RAM)
@@ -65,7 +65,7 @@ When something is unspecified, delegate rather than guess:
 ## Rules
 - No placeholders or TODOs — every section fully resolved
 - Bullet points only, keep sections short
-- Don't invent specifics; infer only from writeup + conversation
+- Don't invent specifics; infer only from README + conversation
 - Always include explicit seeds for all RNG sources
 - Size models/batches to fit available VRAM/RAM
 - If prerequisites exist, also create `<folder>/instructions.md` with human-readable setup steps

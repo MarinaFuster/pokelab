@@ -1,9 +1,9 @@
 # Research Writeup Generator
 
-When the user asks to create a writeup from a conversation about an experimental/research question, generate a `writeup.md` file with the structure below.
+When the user asks to create a README from a conversation about an experimental/research question, generate a `README.md` file with the structure below.
 
 ## Parameters
-- **folder** (required): the user must provide a destination folder path. If not given, ask for it before proceeding. Create the file at `<folder>/writeup.md`.
+- **folder** (required): the user must provide a destination folder path. If not given, ask for it before proceeding. Create the file at `<folder>/README.md`.
 
 ## Rules
 - Fill only **Question** and **Simplifications** from the conversation context
@@ -11,12 +11,10 @@ When the user asks to create a writeup from a conversation about an experimental
 - Be concise — extract, don't elaborate
 - A few emoji as section accents are fine; don't overdo it
 
-## Output file: `writeup.md`
+## Output file: `README.md`
 
 ```markdown
-# 📋 Research Writeup
-
-## ❓ Question
+# ❓ Question
 [The refined research question from the conversation]
 
 ## 💡 Thought Process

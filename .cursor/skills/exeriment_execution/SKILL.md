@@ -1,17 +1,17 @@
 ---
 name: experiment-executor
-description: Execute an ML experiment defined in execution_plan.md, using writeup.md for context. Use when the user asks to run, execute, or carry out an experiment plan. Always use this skill when both an execution_plan.md and writeup.md are present and the user wants to proceed with execution.
+description: Execute an ML experiment defined in execution_plan.md, using README.md for context. Use when the user asks to run, execute, or carry out an experiment plan. Always use this skill when both an execution_plan.md and README.md are present and the user wants to proceed with execution.
 ---
 
 # Experiment Executor
 
-Execute the experiment defined in `<folder>/execution_plan.md`, using `<folder>/writeup.md` for full context.
+Execute the experiment defined in `<folder>/execution_plan.md`, using `<folder>/README.md` for full context.
 
 ## Parameters
 - **folder** (required): path containing both files. Ask if not provided.
 
 ## Behavior
-1. Read `<folder>/writeup.md` for context (question, simplifications, experiment idea)
+1. Read `<folder>/README.md` for context (question, simplifications, experiment idea)
 2. Read `<folder>/execution_plan.md` as the authoritative instruction set
 3. Follow the Steps section sequentially
 4. Track every deviation from the plan as it occurs (see Output)
@@ -64,5 +64,5 @@ Write this file when all steps are complete (or execution is halted).
 - Prefer failing loudly over guessing silently
 - **Do not interpret, analyse, or draw conclusions from results** — record outputs and artifacts only; leave conclusions to the user
 - Every deviation, even minor ones (e.g. version mismatch resolved automatically), must be logged
-- **Do not complete 🔎 Final Comments** in writeup.md, just complete 📊 Results section.
-- Do not repeat deviations, constraints, etc. everywhere. If you have filed them in execution_report.md, do not include that in the .ipynb or writeup.md
+- **Do not complete 🔎 Final Comments** in README.md, just complete 📊 Results section.
+- Do not repeat deviations, constraints, etc. everywhere. If you have filed them in execution_report.md, do not include that in the .ipynb or README.md
