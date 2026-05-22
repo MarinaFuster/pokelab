@@ -1,0 +1,11 @@
+generator,label_name,bird,dog,food,structure,vehicle
+ADM,ai,56,283,117,56,105
+ADM,nature,128,223,91,47,83
+BigGAN,ai,143,290,124,55,101
+BigGAN,nature,128,229,91,47,80
+GLIDE,nature,112,239,92,42,82
+Midjourney,ai,63,315,130,46,106
+Midjourney,nature,111,243,95,30,77
+Stable Diffusion V1.5,ai,163,319,107,50,98
+Stable Diffusion V1.5,nature,115,232,84,38,73
+VQDM,nature,132,231,90,51,82
