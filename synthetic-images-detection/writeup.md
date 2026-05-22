@@ -47,7 +47,7 @@ Run the same UMAP + distance analysis in FFT space (2a) and noise residual space
 ## 📊 Results
 
 ### Dataset (as actually run)
-- **Synthetic**: BigGAN and Stable Diffusion v1.5 splits from `Qwerty0193/genimage-processed` (Tiny GenImage). The original execution plan requested 5 fine-grained ImageNet classes × 500 images/source, but the dataset contains only ~5 images per (generator, ImageNet class). I therefore replaced fine classes with 5 **ImageNet super-categories** (`dog`, `bird`, `vehicle`, `food`, `structure`), defined by curated sets of ImageNet-1k class indices.
+- **Synthetic**: BigGAN and Stable Diffusion v1.5 splits from `Qwerty0193/genimage-processed` (Tiny GenImage). There were 5 **"super-categories"** (`dog`, `bird`, `vehicle`, `food`, `structure`), defined by curated sets of ImageNet-1k classes.
 - **Real**: `ILSVRC/imagenet-1k` validation split, filtered to the same 5 super-categories.
 - **Final sample counts**:
 
@@ -60,7 +60,7 @@ Run the same UMAP + distance analysis in FFT space (2a) and noise residual space
   Total: 3,950 images. All synthetic cells under the 500 cap use all available images, per the plan.
 
 ### Numbers
-Mean pairwise L2 distance + silhouette scores per feature space (see `results/metrics.csv`):
+Mean pairwise L2 distance per feature space (see `results/metrics.csv`):
 
 | measurement | CLIP | FFT | SRM |
 |---|---:|---:|---:|
@@ -68,26 +68,24 @@ Mean pairwise L2 distance + silhouette scores per feature space (see `results/me
 | BigGAN vs SDv1.5 (same cat) | 0.86 | **78.8** | 2.86 |
 | real vs fake (same cat) | 0.88 | 67.9 | 3.95 |
 | real-cat A vs real-cat B | **1.03** | 61.2 | **5.10** |
-| silhouette real vs fake | 0.01 | 0.06 | -0.06 |
-| silhouette GAN vs diffusion (fakes only) | 0.04 | **0.25** | 0.17 |
-| silhouette 3-class (real/GAN/diff) | -0.01 | 0.03 | -0.32 |
+
+Silhouette scores per feature space (see `results/metrics.csv`):
+
+| measurement | CLIP | FFT | SRM |
+|---|---:|---:|---:|
+| real vs fake | 0.01 | 0.06 | -0.06 |
+| GAN vs diffusion (fakes only) | 0.04 | **0.25** | 0.17 |
+| 3-class (real/GAN/diff) | -0.01 | 0.03 | -0.32 |
 
 ### What the UMAPs show
-- `results/umap_clip.png` — four content blobs (dog, food, vehicle/structure, bird), each containing all three sources intermixed. Source is invisible; content dominates.
-- `results/umap_fft.png` — **two distinct regions**: BigGAN forms a clean, isolated cluster of its own. Real and SDv1.5 are mixed in a single elongated cluster. SDv1.5 sits closer to real photos than to BigGAN.
-- `results/umap_srm.png` — one diffuse blob, no clear separation by source or by super-category.
 
-### Reading
-
-| Comparison from the writeup | Predicted if single-class holds | What FFT shows | Verdict |
-|---|---|---|---|
-| fake-GAN vs. fake-diffusion | small (≈ same-pipeline reference) | **larger than every other contrast (78.8)** | ✗ |
-| real vs. fake (same content) | large | medium (67.9) | partial |
-| real cat vs. real dog | small (same-pipeline reference) | also medium (61.2) — *smaller* than BigGAN-vs-SDv1.5 | ✗ |
-
-In the frequency domain the same-pipeline reference (different real categories, 61.2) is **smaller** than the inter-generator distance (BigGAN vs SDv1.5, 78.8). Two synthetic mechanisms are further apart from each other than two random content classes inside the real pipeline. This is the cleanest single piece of evidence against treating "synthetic" as a unified class.
-
-The silhouette confirms it: `GAN vs diffusion (fakes only) = 0.25` in FFT space — the largest separability score in the whole table.
+<table>
+<tr>
+<td align="center" width="33%"><img src="results/umap_clip.png" alt="UMAP of CLIP features" width="100%"/><br/><sub><b>CLIP (semantic)</b></sub></td>
+<td align="center" width="33%"><img src="results/umap_fft.png" alt="UMAP of FFT log-magnitude features" width="100%"/><br/><sub><b>FFT (frequency)</b></sub></td>
+<td align="center" width="33%"><img src="results/umap_srm.png" alt="UMAP of SRM residual features" width="100%"/><br/><sub><b>SRM (noise residual)</b></sub></td>
+</tr>
+</table>
 
 ## 🔎 Final Comments
 
